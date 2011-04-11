@@ -1,0 +1,36 @@
+%wd
+%Fl(2,12-Nimbus.fnt)
+%xl(B,battery.bmp,112,0,6)
+%xl(A,playmode.bmp,19,0,4)
+%xl(C,shuffle.bmp,0,0)
+%xl(D,repeats.bmp,24,0,4)
+#
+# TOP PART
+%V(0,0,-,16,0)
+#
+# shuffle icon, repeat mode icon & playlist position
+%ac%?ps<%xd(C)|>%?mm<|%xd(Da)|%xd(Db)|%xd(Dc)|%xd(Dd)>%pp/%pe
+#
+# playlist pos & battery icon
+%?bp<%xd(Ba)|%?bl<%xd(Bb)|%xd(Bc)|%xd(Bd)|%xd(Be)|%xd(Bf)>>
+#
+# MIDDLE PART
+%V(0,16,-,32,2)
+#
+# artist
+%s%ac%ia
+#
+# track (or filename if no metadata)
+%s%ac%?it<%it|%fm>
+#
+# BOTTOM LEFT
+%V(0,48,-,-,0)
+#
+# play mode icon & progress bar
+%?mp<|%xd(Aa)|%xd(Ab)|%xd(Ac)|%xd(Ad)>%pb(32,1,60,6,-)
+#
+# BOTTOM RIGHT
+%V(94,48,-,-,0)
+#
+# time elapsed
+%pc

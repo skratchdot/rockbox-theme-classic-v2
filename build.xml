@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="rockbox-theme-classic-v2" default="build" basedir="." xmlns:ac="antlib:net.sf.antcontrib">
+	<property name="bin" value="${basedir}/bin" />
+	<property name="src" value="${basedir}/src" />
+	<property name="themeName" value="classic-v2" />
+	<property name="zipFolder" value="${bin}/${themeName}" />
+	<property name="zipName" value="${zipFolder}.zip" />
+	<property name="bin_cfg" value="${zipFolder}/.rockbox/themes/${themeName}.cfg" />
+	<property name="bin_wps" value="${zipFolder}/.rockbox/wps/${themeName}.wps" />
+	<property name="src_cfg" value="${src}/${themeName}/.rockbox/themes/${themeName}.cfg" />
+	<property name="src_wps" value="${src}/${themeName}/.rockbox/wps/${themeName}.wps" />
+
+	<taskdef
+		uri="antlib:net.sf.antcontrib"
+		resource="net/sf/antcontrib/antlib.xml"
+		classpath="${basedir}/lib/ant-contrib-1.0b3.jar"
+	/>
+
+	<target name="clean.bin">
+		<echo>Clean bin folder (${bin})...starting</echo>
+		<delete dir="${bin}"/>
+		<echo>Clean bin folder (${bin})...finished</echo>
+	</target>
+
+	<target name="copy.src" depends="clean.bin">
+		<echo>Copy src folder (${src})...starting</echo>
+		<copy todir="${bin}">
+			<fileset dir="${src}" />
+		</copy>
+		<echo>Copy src folder (${src})...finished</echo>
+	</target>
+
+	<target name="cfg.wps.empty" depends="copy.src">
+		<echo>Empty cfg and wps files...starting</echo>
+		<concat append="false" destfile="${bin_cfg}" fixlastline="no">#${line.separator}</concat>
+		<concat append="false" destfile="${bin_wps}" fixlastline="no">#${line.separator}</concat>
+		<echo>Empty cfg and wps files...finished</echo>
+	</target>
+
+	<target name="cfg.wps.readme" depends="cfg.wps.empty">
+		<echo>Add readme info to cfg and wps file...starting</echo>
+		<ac:var name="displayThemeInfo" value="false" />
+		<loadfile property="readme" srcfile="README.md" />
+		<ac:for param="line" list="${readme}" delimiter="${line.separator}">
+			<ac:sequential>
+				<ac:if>
+					<ac:equals arg1="${displayThemeInfo}" arg2="true" />
+					<ac:then>
+						<concat append="true" destfile="${bin_cfg}">#@{line}${line.separator}</concat>
+						<concat append="true" destfile="${bin_wps}">#@{line}${line.separator}</concat>
+						<echo>#@{line}</echo>
+					</ac:then>
+				</ac:if>
+				<ac:if>
+					<ac:equals arg1="@{line}" arg2="### Theme Information: ###" />
+					<ac:then>
+						<ac:var name="displayThemeInfo" value="true" />
+					</ac:then>
+				</ac:if>
+			</ac:sequential>
+		</ac:for>
+		<echo>Add readme info to cfg and wps file...finished</echo>
+	</target>
+
+	<target name="cfg.wps.data" depends="cfg.wps.readme">
+		<echo>Complete cfg and wps file...starting</echo>
+		<concat append="true" destfile="${bin_cfg}">
+			<path path="${src_cfg}" />
+		</concat>
+		<concat append="true" destfile="${bin_wps}">
+			<path path="${src_wps}" />
+		</concat>
+		<echo>Complete cfg and wps file...finished</echo>
+	</target>
+
+	<target name="zip.files" depends="cfg.wps.data">
+		<echo>Create .zip file...starting</echo>
+		<zip destfile="${zipName}" basedir="${zipFolder}" />
+		<echo>Create .zip file...finished</echo>
+	</target>
+
+	<target name="delete.zip.folder" depends="zip.files">
+		<echo>Delete zip folder...starting</echo>
+		<delete dir="${zipFolder}"/>
+		<echo>Delete zip folder...finished</echo>
+	</target>
+
+	<target name="refresh.project" depends="delete.zip.folder">
+		<echo>Refresh ${ant.project.name}...starting</echo>
+		<eclipse.refreshLocal resource="${ant.project.name}" depth="infinite" />
+		<echo>Refresh ${ant.project.name}...finished</echo>
+	</target>
+
+	<target name="build" depends="refresh.project">
+		<echo>Ant build...finished</echo>
+	</target>
+
+</project> 
